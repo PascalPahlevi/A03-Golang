@@ -59,9 +59,25 @@ func main() {
 	}
 }
 
-func HandleConnection(connection net.Conn) {
-	//This progrom handles the incoming request from client
-
+func HandleConnection(conn net.Conn) {
+	defer conn.Close()
+   
+	buffer := make([]byte, BUFFER_SIZE)
+	length, err := conn.Read(buffer)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+   
+	rawRequest := buffer[:length]
+	request := RequestDecoder(rawRequest)
+	response := HandleRequest(request)
+	encodedResponse := ResponseEncoder(response)
+   
+	_, err = conn.Write(encodedResponse)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func HandleRequest(req HttpRequest) HttpResponse {
