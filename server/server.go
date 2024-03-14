@@ -89,48 +89,72 @@ func HandleRequest(req HttpRequest) HttpResponse {
 	var res HttpResponse
 	res.Version = "HTTP/1.1"
 
-	students := []Student{
-		{"Muhamad Pascal Alfin Pahlevi", "2206046752"},
-		{"Tiva Adhisti Nafira Putri", "2206046840"},
-		{"Raisa Fadilla", "2206822414"},
-	}
-
-	if req.Uri == "/" || req.Uri == "/?name="+GROUP_NAME {
+	// students := []Student{
+	// 	{"Muhamad Pascal Alfin Pahlevi", "2206046752"},
+	// 	{"Tiva Adhisti Nafira Putri", "2206046840"},
+	// 	{"Raisa Fadilla", "2206822414"},
+	// }
+	switch req.Uri {
+	case "/", "/?name=" + GROUP_NAME:
 		res.StatusCode = "200 OK"
 		res.ContentType = "text/html"
 		res.Data = fmt.Sprintf("<html><body>Welcome to %s homepage!</body></html>", GROUP_NAME)
-	} else if req.Uri == "/data" {
-		if strings.Contains(req.Accept, "application/xml") {
-			res.ContentType = "application/xml"
-			xmlData, err := xml.Marshal(students)
-			if err != nil {
-				log.Println("XML marshalling error:", err)
-				res.StatusCode = "500 Internal Server Error"
-				return res
-			}
-			res.Data = string(xmlData)
-		} else { // Default to JSON
-			res.ContentType = "application/json"
-			jsonData, err := json.Marshal(students)
-			if err != nil {
-				log.Println("JSON marshalling error:", err)
-				res.StatusCode = "500 Internal Server Error"
-				return res
-			}
-			res.Data = string(jsonData)
-		}
+	case "/data":
 		res.StatusCode = "200 OK"
-	} else if req.Uri == "/greeting" {
-        res.StatusCode = "200 OK"
-        res.ContentType = "text/html"
-        greeting := "Hello, We are from CN01!" // Default greeting
-        if strings.Contains(strings.ToLower(req.AcceptLanguage), "id") {
-            greeting = "Halo, Kami dari CN01!"
-        }
-        res.Data = fmt.Sprintf("<html><body>%s</body></html>", greeting)
-    } else {
-        res.StatusCode = "404 Not Found"
-        res.Data = "404 Page Not Found"
+		res.ContentType = "application/json" // Assuming JSON as the default
+		// Sample data, replace with actual group members
+		res.Data = `[{"Muhamad Pascal Alfin Pahlevi", "2206046752"},
+		{"Tiva Adhisti Nafira Putri", "2206046840"},
+		{"Raisa Fadilla", "2206822414"},]`
+	case "/greeting":
+		res.StatusCode = "200 OK"
+		res.ContentType = "text/html"
+		// Defaulting to English-US if no Accept-Language header provided
+		greeting := "Hello, We are from CN01!"
+		if strings.Contains(req.AcceptLanguage, "id") { // Assuming 'id' for Indonesian
+			greeting = "Halo, Kita dari CN01!"
+		}
+		res.Data = fmt.Sprintf("<html><body>%s</body></html>", greeting)
+	default:
+		res.StatusCode = "404 Not Found"
+	}
+
+	// if req.Uri == "/" || req.Uri == "/?name="+GROUP_NAME {
+	// 	res.StatusCode = "200 OK"
+	// 	res.ContentType = "text/html"
+	// 	res.Data = fmt.Sprintf("<html><body>Welcome to %s homepage!</body></html>", GROUP_NAME)
+	// } else if req.Uri == "/data" {
+	// 	if strings.Contains(req.Accept, "application/xml") {
+	// 		res.ContentType = "application/xml"
+	// 		xmlData, err := xml.Marshal(students)
+	// 		if err != nil {
+	// 			log.Println("XML marshalling error:", err)
+	// 			res.StatusCode = "500 Internal Server Error"
+	// 			return res
+	// 		}
+	// 		res.Data = string(xmlData)
+	// 	} else { // Default to JSON
+	// 		res.ContentType = "application/json"
+	// 		jsonData, err := json.Marshal(students)
+	// 		if err != nil {
+	// 			log.Println("JSON marshalling error:", err)
+	// 			res.StatusCode = "500 Internal Server Error"
+	// 			return res
+	// 		}
+	// 		res.Data = string(jsonData)
+	// 	}
+	// 	res.StatusCode = "200 OK"
+	// } else if req.Uri == "/greeting" {
+    //     res.StatusCode = "200 OK"
+    //     res.ContentType = "text/html"
+    //     greeting := "Hello, We are from CN01!" // Default greeting
+    //     if strings.Contains(strings.ToLower(req.AcceptLanguage), "id") {
+    //         greeting = "Halo, Kami dari CN01!"
+    //     }
+    //     res.Data = fmt.Sprintf("<html><body>%s</body></html>", greeting)
+    // } else {
+    //     res.StatusCode = "404 Not Found"
+    //     res.Data = "404 Page Not Found"
     }
 
 	return res
