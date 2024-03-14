@@ -48,6 +48,15 @@ func main() {
 
 	fmt.printf("TCP Sever Socket Program in Go\n")
 	fmt.printf("[%s] Preparing TCP listening socket on %s\n", serverType, socket.LocalAddr())
+
+	for {
+		connection, err := socket.AcceptTCP()
+		if err != nil {
+			log.Fatalln(err)
+		}
+
+		go HandleConnection(connection)
+	}
 }
 
 func HandleConnection(connection net.Conn) {
