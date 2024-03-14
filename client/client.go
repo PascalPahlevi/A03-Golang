@@ -34,6 +34,12 @@ const (
 func main() {
 	//The Program logic should go here.
 
+	fmt.print("Input the URL: ")
+	
+	fmt.print("Input the data type: ")
+
+	fmt.print("input the language: ")
+
 }
 
 func Fetch(req HttpRequest, connection net.Conn) (HttpResponse, []Student, HttpRequest) {
