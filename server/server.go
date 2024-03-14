@@ -160,10 +160,16 @@ func RequestDecoder(bytestream []byte) HttpRequest {
 	return req
 }
 
+
 func ResponseEncoder(res HttpResponse) []byte {
 	//Put the encoding program for HTTP Response Struct here
-	var result string
-
-	return []byte(result)
-
+	var result strings.Builder
+	result.WriteString(fmt.Sprintf("%s %s\r\n", res.Version, res.StatusCode))
+	result.WriteString(fmt.Sprintf("Content-Type: %s\r\n", res.ContentType))
+	if res.ContentLanguage != "" {
+		result.WriteString(fmt.Sprintf("Content-Language: %s\r\n", res.ContentLanguage))
+	}
+	result.WriteString("\r\n")
+	result.WriteString(res.Data)
+	return []byte(result.String())
 }
