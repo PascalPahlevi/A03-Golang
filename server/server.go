@@ -121,18 +121,17 @@ func HandleRequest(req HttpRequest) HttpResponse {
 		}
 		res.StatusCode = "200 OK"
 	} else if req.Uri == "/greeting" {
-		res.StatusCode = "200 OK"
-		res.ContentType = "text/html"
-		var greeting string
-		if strings.Contains(req.AcceptLanguage, "id") {
-			greeting = "Halo, Kami dari CN01!"
-		} else if strings.Contains(req.AcceptLanguage, "en") {
-			greeting = "Hello, We are from CN01!"
-		}
-		res.Data = fmt.Sprintf("<html><body>%s</body></html>", greeting)
-	} else {
-		res.StatusCode = "404 Not Found"
-	}
+        res.StatusCode = "200 OK"
+        res.ContentType = "text/html"
+        greeting := "Hello, We are from CN01!" // Default greeting
+        if strings.Contains(strings.ToLower(req.AcceptLanguage), "id") {
+            greeting = "Halo, Kami dari CN01!"
+        }
+        res.Data = fmt.Sprintf("<html><body>%s</body></html>", greeting)
+    } else {
+        res.StatusCode = "404 Not Found"
+        res.Data = "404 Page Not Found"
+    }
 
 	return res
 }
