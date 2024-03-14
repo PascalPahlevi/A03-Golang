@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	SERVER_HOST = ""
-	SERVER_PORT = ""
+	SERVER_HOST = "127.0.0.1"
+	SERVER_PORT = "8000"
 	SERVER_TYPE = "tcp"
 	BUFFER_SIZE = 1024
 	GROUP_NAME  = "CN01"
