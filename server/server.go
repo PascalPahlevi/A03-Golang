@@ -65,8 +65,55 @@ func HandleConnection(connection net.Conn) {
 }
 
 func HandleRequest(req HttpRequest) HttpResponse {
-	//This program handles the routing to each view handler.
+	var res HttpResponse
+	res.Version = "HTTP/1.1"
 
+	students := []Student{
+		{"Muhamad Pascal Alfin Pahlevi", "2206046752"},
+		{"Tiva Adhisti Nafira Putri", "2206046840"},
+		{"Raisa Fadilla", "2206822414"},
+	}
+
+	if req.Uri == "/" || req.Uri == "/?name="+GROUP_NAME {
+		res.StatusCode = "200 OK"
+		res.ContentType = "text/html"
+		res.Data = fmt.Sprintf("<html><body>Welcome to %s homepage!</body></html>", GROUP_NAME)
+	} else if req.Uri == "/data" {
+		if strings.Contains(req.Accept, "application/xml") {
+			res.ContentType = "application/xml"
+			xmlData, err := xml.Marshal(students)
+			if err != nil {
+				log.Println("XML marshalling error:", err)
+				res.StatusCode = "500 Internal Server Error"
+				return res
+			}
+			res.Data = string(xmlData)
+		} else { // Default to JSON
+			res.ContentType = "application/json"
+			jsonData, err := json.Marshal(students)
+			if err != nil {
+				log.Println("JSON marshalling error:", err)
+				res.StatusCode = "500 Internal Server Error"
+				return res
+			}
+			res.Data = string(jsonData)
+		}
+		res.StatusCode = "200 OK"
+	} else if req.Uri == "/greeting" {
+		res.StatusCode = "200 OK"
+		res.ContentType = "text/html"
+		var greeting string
+		if strings.Contains(req.AcceptLanguage, "id") {
+			greeting = "Halo, Kami dari CN01!"
+		} else if strings.Contains(req.AcceptLanguage, "en") {
+			greeting = "Hello, We are from CN01!"
+		}
+		res.Data = fmt.Sprintf("<html><body>%s</body></html>", greeting)
+	} else {
+		res.StatusCode = "404 Not Found"
+	}
+
+	return res
 }
 
 func RequestDecoder(bytestream []byte) HttpRequest {
