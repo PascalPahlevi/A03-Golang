@@ -74,9 +74,14 @@ func main() {
 	response, students := Fetch(request, conn)
 
 	fmt.Printf("Response Status: %s\n", response.StatusCode)
-	fmt.Printf("Response ContentType: %s\n", response.ContentType)
-	for _, student := range students {
-		fmt.Printf("Student Name: %s, NPM: %s\n", student.Nama, student.Npm)
+	fmt.Println("Status: ", response.StatusCode)
+	fmt.Print("Body:")
+	if response.ContentType == "text/html" {
+		fmt.Println(response.Data)
+	} else if response.ContentType == "application/xml" {
+		fmt.Println(students)
+	} else if response.ContentType == "application/json" {
+		fmt.Println(students)
 	}
 }
 

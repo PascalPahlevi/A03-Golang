@@ -11,7 +11,7 @@ import (
 
 const (
 	SERVER_HOST = "127.0.0.1"
-	SERVER_PORT = "8000"
+	SERVER_PORT = "8080"
 	SERVER_TYPE = "tcp"
 	BUFFER_SIZE = 1024
 	GROUP_NAME  = "CN01"
@@ -51,7 +51,7 @@ func main() {
 
 	defer socket.Close()
 
-	fmt.Printf("TCP Sever Socket Program in Go\n")
+	fmt.Printf("TCP Server Socket Program in Go\n")
 	fmt.Printf("[%s] Preparing TCP listening socket on %s\n", SERVER_TYPE, socket.Addr().String())
 
 	for {
