@@ -1,7 +1,12 @@
 package main
 
 import (
+	"encoding/json"
+	"encoding/xml"
+	"fmt"
+	"log"
 	"net"
+	"strings"
 )
 
 const (
@@ -13,12 +18,12 @@ const (
 )
 
 type HttpRequest struct {
-	Method          string
-	Uri             string
-	Version         string
-	Host            string
-	Accept          string
-	AcceptLanguange string
+	Method         string
+	Uri            string
+	Version        string
+	Host           string
+	Accept         string
+	AcceptLanguage string
 }
 
 type HttpResponse struct {
@@ -35,19 +40,19 @@ type Student struct {
 }
 
 func main() {
-	serverAddress err:= net.resolveTCPAddr(serverType, net.joinHotPort(serverIP, serverPort))
-	if err!= nil {
+	serverAddress, err := net.ResolveTCPAddr(SERVER_TYPE, net.JoinHostPort(SERVER_HOST, SERVER_PORT))
+	if err != nil {
 		log.Fatalln(err)
 	}
-	socket, err := net.ListenTCP(serverType, serverAddress)
+	socket, err := net.ListenTCP(SERVER_TYPE, serverAddress)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
 	defer socket.Close()
 
-	fmt.printf("TCP Sever Socket Program in Go\n")
-	fmt.printf("[%s] Preparing TCP listening socket on %s\n", serverType, socket.LocalAddr())
+	fmt.Printf("TCP Sever Socket Program in Go\n")
+	fmt.Printf("[%s] Preparing TCP listening socket on %s\n", SERVER_TYPE, socket.Addr().String())
 
 	for {
 		connection, err := socket.AcceptTCP()
@@ -61,19 +66,19 @@ func main() {
 
 func HandleConnection(conn net.Conn) {
 	defer conn.Close()
-   
+
 	buffer := make([]byte, BUFFER_SIZE)
 	length, err := conn.Read(buffer)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-   
+
 	rawRequest := buffer[:length]
 	request := RequestDecoder(rawRequest)
 	response := HandleRequest(request)
 	encodedResponse := ResponseEncoder(response)
-   
+
 	_, err = conn.Write(encodedResponse)
 	if err != nil {
 		log.Println(err)
@@ -136,30 +141,29 @@ func RequestDecoder(bytestream []byte) HttpRequest {
 	var req HttpRequest
 	lines := strings.Split(string(bytestream), "\r\n")
 	for i, line := range lines {
-	 	if i == 0 { 
-	  		parts := strings.Split(line, " ")
-	  		if len(parts) >= 3 {
+		if i == 0 {
+			parts := strings.Split(line, " ")
+			if len(parts) >= 3 {
 				req.Method = parts[0]
 				req.Uri = parts[1]
 				req.Version = parts[2]
-	  		}
-	  	} else { 
+			}
+		} else {
 			headerParts := strings.SplitN(line, ": ", 2)
 			if len(headerParts) == 2 {
-	   			switch headerParts[0] {
-	   				case "Host":
-						req.Host = headerParts[1]
-	   				case "Accept":
-						req.Accept = headerParts[1]
-	   				case "Accept-Language":
-						req.AcceptLanguage = headerParts[1]
-		 		}
+				switch headerParts[0] {
+				case "Host":
+					req.Host = headerParts[1]
+				case "Accept":
+					req.Accept = headerParts[1]
+				case "Accept-Language":
+					req.AcceptLanguage = headerParts[1]
+				}
 			}
-	  	}
+		}
 	}
 	return req
 }
-
 
 func ResponseEncoder(res HttpResponse) []byte {
 	//Put the encoding program for HTTP Response Struct here
