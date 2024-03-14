@@ -45,6 +45,9 @@ func main() {
 	}
 
 	defer socket.Close()
+
+	fmt.printf("TCP Sever Socket Program in Go\n")
+	fmt.printf("[%s] Preparing TCP listening socket on %s\n", serverType, socket.LocalAddr())
 }
 
 func HandleConnection(connection net.Conn) {
