@@ -1,7 +1,11 @@
 package main
 
 import (
+	"bufio"
+	"fmt"
 	"net"
+	"os"
+	"strings"
 )
 
 type HttpRequest struct {
@@ -32,14 +36,32 @@ const (
 )
 
 func main() {
-	//The Program logic should go here.
+	reader := bufio.NewReader(os.Stdin)
 
-	fmt.print("Input the URL: ")
-	
-	fmt.print("Input the data type: ")
+	fmt.Print("Input the URL: ")
+	urlInput, _ := reader.ReadString('\n')
+	urlInput = strings.TrimSpace(urlInput)
 
-	fmt.print("input the language: ")
+	fmt.Print("Input the data type: ")
+	mimeType, _ := reader.ReadString('\n')
+	mimeType = strings.TrimSpace(mimeType)
 
+	fmt.Print("Input the language: ")
+	language, _ := reader.ReadString('\n')
+	language = strings.TrimSpace(language)
+
+	urlParts := strings.Split(urlInput, "/")
+	hostPort := urlParts[2]
+	uri := "/" + strings.Join(urlParts[3:], "/")
+
+	request := HttpRequest{
+		Method:         "GET",
+		Uri:            uri,
+		Version:        "HTTP/1.1",
+		Host:           hostPort,
+		Accept:         mimeType,
+		AcceptLanguage: language,
+	}
 }
 
 func Fetch(req HttpRequest, connection net.Conn) (HttpResponse, []Student, HttpRequest) {
