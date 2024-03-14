@@ -133,11 +133,31 @@ func HandleRequest(req HttpRequest) HttpResponse {
 }
 
 func RequestDecoder(bytestream []byte) HttpRequest {
-	//Put the decoding program for HTTP Request Packet here
 	var req HttpRequest
-
+	lines := strings.Split(string(bytestream), "\r\n")
+	for i, line := range lines {
+	 	if i == 0 { 
+	  		parts := strings.Split(line, " ")
+	  		if len(parts) >= 3 {
+				req.Method = parts[0]
+				req.Uri = parts[1]
+				req.Version = parts[2]
+	  		}
+	  	} else { 
+			headerParts := strings.SplitN(line, ": ", 2)
+			if len(headerParts) == 2 {
+	   			switch headerParts[0] {
+	   				case "Host":
+						req.Host = headerParts[1]
+	   				case "Accept":
+						req.Accept = headerParts[1]
+	   				case "Accept-Language":
+						req.AcceptLanguage = headerParts[1]
+		 		}
+			}
+	  	}
+	}
 	return req
-
 }
 
 func ResponseEncoder(res HttpResponse) []byte {
